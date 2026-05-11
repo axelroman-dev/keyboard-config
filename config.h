@@ -12,7 +12,8 @@
 //#define USE_MATRIX_I2C
 
 //#define QUICK_TAP_TERM 0
-//#define TAPPING_TERM 100
+#define TAPPING_TERM 200
+#define PERMISSIVE_HOLD
 
 /* ─── RGB ────────────────────────────────────────────────────────────────*/
 #ifdef RGBLIGHT_ENABLE
