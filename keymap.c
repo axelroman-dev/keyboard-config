@@ -7,26 +7,34 @@
  *   1 NAV     — Números, F1-F12, Home/End/PgUp/PgDn, flechas
  *   2 SYM     — Símbolos balanceados: brackets izquierda, operadores derecha
  *   3 ADJUST  — RGB, media, boot
+ *   4 MOUSE   — Auto mouse layer: clics, scroll, drag (se activa al mover trackpad)
  *
- * Cambios vs layout original:
- *   - Esc movido a thumb izquierdo (ideal para Vim/terminal)
- *   - ⌫ movido a posición P (meñique derecho, más natural)
- *   - Del en esquina inferior derecha como respaldo
- *   - Home/End/PgUp/PgDn en home row izquierda de capa 1
- *   - F1-F12 completas en capa 1 (F1-F5+F11 izquierda, F6-F10+F12 derecha)
- *   - {} [] () movidos a mano izquierda en capa 2 (home row y fila inferior)
- *   - < > añadidos en capa 2 izquierda (útiles para HTML/JSX/generics)
- *   - Operadores de código en derecha: | _ + : \ " / ?
+ * Trackpad Cirque Pinnacle (lado derecho):
+ *   - Tap 1 dedo        → click izquierdo
+ *   - 2 dedos deslizar  → scroll vertical y horizontal
+ *   - Capa MOUSE auto   → BTN1/BTN2/BTN3 accesibles con el pulgar izquierdo
  *
  * Inglés Internacional (AltGr = RAlt):
  *   ñ  = AltGr + N       á é í ó ú = AltGr + vocal
  *   ü  = AltGr + Y       ¡ = AltGr + 1    ¿ = AltGr + /
- *   «» = AltGr + [ ]
  *
  * Copyright 2019 @foostan / 2020 Drashna Jaelre — GPLv2+
  */
 
 #include QMK_KEYBOARD_H
+
+/* ─── Auto mouse layer ───────────────────────────────────────────────────────
+ * Se activa automáticamente al detectar movimiento del trackpad.
+ * Requiere AUTO_MOUSE_ENABLE = yes en rules.mk
+ * ─────────────────────────────────────────────────────────────────────────*/
+#define AUTO_MOUSE_DEFAULT_LAYER 4
+
+#ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+void pointing_device_init_user(void) {
+    set_auto_mouse_layer(AUTO_MOUSE_DEFAULT_LAYER);
+    set_auto_mouse_enable(true);
+}
+#endif
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -34,26 +42,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * Capa 0: BASE
      *
      * ┌───────┬───┬───┬───┬───┬───┐           ┌───┬───┬───┬───┬───┬───────┐
-     * │  Tab  │ Q │ W │ E │ R │ T │           │ Y │ U │ I │ O │ P │   ⌫   │  ← meñique derecho (antes en esquina)
+     * │  Tab  │ Q │ W │ E │ R │ T │           │ Y │ U │ I │ O │ P │  ⌫    │
      * ├───────┼───┼───┼───┼───┼───┤           ├───┼───┼───┼───┼───┼───────┤
-     * │ Shift │ A │ S │ D │ F │ G │           │ H │ J │ K │ L │ ; │   '   │
+     * │  Ctrl │ A │ S │ D │ F │ G │           │ H │ J │ K │ L │ ; │  '    │
      * ├───────┼───┼───┼───┼───┼───┤           ├───┼───┼───┼───┼───┼───────┤
-     * │ Ctrl  │ Z │ X │ C │ V │ B │           │ N │ M │ , │ . │ / │  Del  │
+     * │ Shift │ Z │ X │ C │ V │ B │           │ N │ M │ , │ . │ / │  Esc  │
      * └───────┴───┴───┴───┴───┴───┘           └───┴───┴───┴───┴───┴───────┘
      *                     ┌───────┬───────┬───────┐ ┌───────┬───────┬───────┐
-     *                     │  Esc  │ MO(1) │ Space │ │ Enter │ MO(2) │ RAlt  │
+     *                     │  GUI  │ MO(1) │ Space │ │ Enter │ MO(2) │ RAlt  │
      *                     └───────┴───────┴───────┘ └───────┴───────┴───────┘
-     *                       ↑ Esc en thumb: perfecto para Vim y terminal
      * ─────────────────────────────────────────────────────────────────────*/
     [0] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,    KC_P, KC_BSPC,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,
+      KC_LCTL,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,  KC_DEL,
+      KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, KC_ESC,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                           KC_ESC,   MO(1),  KC_SPC,    KC_ENT,   MO(2), KC_RALT
+                                          KC_LGUI,   MO(1),  KC_SPC,    KC_ENT,   MO(2), KC_RALT
                                       //`--------------------------'  `--------------------------'
     ),
 
@@ -61,29 +68,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * Capa 1: NAV — Números, teclas de función, navegación
      *
      * ┌───────┬────┬────┬────┬────┬────┐           ┌───┬───┬───┬───┬─────┬───────┐
-     * │  Tab  │ 1  │ 2  │ 3  │ 4  │ 5  │           │ 6 │ 7 │ 8 │ 9 │  0  │   ⌫   │
+     * │  Tab  │ 1  │ 2  │ 3  │ 4  │ 5  │           │ 6 │ 7 │ 8 │ 9 │  0  │  Del  │
      * ├───────┼────┼────┼────┼────┼────┤           ├───┼───┼───┼───┼─────┼───────┤
      * │  Ctrl │Home│PgDn│PgUp│ End│F11 │           │ ← │ ↓ │ ↑ │ → │ F12 │       │
      * ├───────┼────┼────┼────┼────┼────┤           ├───┼───┼───┼───┼─────┼───────┤
      * │ Shift │ F1 │ F2 │ F3 │ F4 │ F5 │           │F6 │F7 │F8 │F9 │ F10 │       │
      * └───────┴────┴────┴────┴────┴────┘           └───┴───┴───┴───┴─────┴───────┘
      *                     ┌───────┬───────┬───────┐ ┌───────┬───────┬───────┐
-     *                     │  GUI  │  ▼▼▼  │ Space │ │ Enter │ MO(3) │ RAlt  │
+     *                     │       │  ▼▼▼  │ Space │ │ Enter │ MO(3) │ RAlt  │
      *                     └───────┴───────┴───────┘ └───────┴───────┴───────┘
-     *
-     * Home/End/PgUp/PgDn en home row izquierda — navegación sin mover manos
-     * Combinaciones útiles:
-     *   Ctrl+Home/End    → inicio/fin del archivo
-     *   Shift+flechas    → selección de texto
-     *   Ctrl+flechas     → saltar palabras
      * ─────────────────────────────────────────────────────────────────────*/
     [1] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-       KC_TAB,    KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                         KC_6,    KC_7,    KC_8,    KC_9,    KC_0, KC_BSPC,
+       KC_TAB,    KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                         KC_6,    KC_7,    KC_8,    KC_9,    KC_0, KC_DEL,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LCTL, KC_HOME, KC_PGDN, KC_PGUP,  KC_END,  KC_F11,                      KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,  KC_F12, XXXXXXX,
+      KC_LCTL, KC_HOME, KC_PGDN, KC_PGUP,  KC_END,  KC_F11,                      KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,  KC_F12, KC_NO,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                        KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10, XXXXXXX,
+      KC_LSFT,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                        KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10, KC_NO,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           KC_LGUI, _______,  KC_SPC,    KC_ENT,   MO(3), KC_RALT
                                       //`--------------------------'  `--------------------------'
@@ -93,23 +94,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * Capa 2: SYM — Símbolos balanceados para programación
      *
      * ┌───────┬───┬───┬───┬───┬───┐           ┌───┬───┬───┬───┬───┬───────┐
-     * │  Tab  │ ! │ @ │ # │ $ │ % │           │ ^ │ & │ * │ - │ = │   ⌫   │
+     * │  Tab  │ ! │ @ │ # │ $ │ % │           │ ^ │ & │ * │ - │ = │  ⌫    │
      * ├───────┼───┼───┼───┼───┼───┤           ├───┼───┼───┼───┼───┼───────┤
-     * │  Ctrl │ { │ } │ ( │ ) │ ` │           │ | │ _ │ + │ : │ \ │   "   │  ← : y " muy usados en código
+     * │  Ctrl │ { │ } │ ( │ ) │ ` │           │ | │ _ │ + │ : │ \ │  "    │
      * ├───────┼───┼───┼───┼───┼───┤           ├───┼───┼───┼───┼───┼───────┤
-     * │ Shift │ [ │ ] │ < │ > │ ~ │           │ / │ ? │   │   │ ; │   '   │
+     * │ Shift │ [ │ ] │ < │ > │ ~ │           │ / │ ? │   │   │ ; │  '    │
      * └───────┴───┴───┴───┴───┴───┘           └───┴───┴───┴───┴───┴───────┘
      *                     ┌───────┬───────┬───────┐ ┌───────┬───────┬───────┐
      *                     │  GUI  │ MO(3) │ Space │ │ Enter │  ▼▼▼  │ RAlt  │
      *                     └───────┴───────┴───────┘ └───────┴───────┴───────┘
-     *
-     * Lógica de distribución:
-     *   Izquierda home row: {} ()  — pares que se abren juntos, se cierran con derecha
-     *   Izquierda fila inf: [] <> — idem para arrays y generics/HTML
-     *   Derecha: operadores binarios | _ + : \ y puntuación ; '
-     *
-     * Nota: KC_LABK = < (less-than), KC_RABK = > (greater-than)
-     *       KC_DQUO = "  KC_COLN = :
      * ─────────────────────────────────────────────────────────────────────*/
     [2] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
@@ -125,18 +118,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     /* ─────────────────────────────────────────────────────────────────────
      * Capa 3: ADJUST — RGB, media, boot
-     * Se activa con MO(1)+MO(2) simultáneos (ambos thumbs de capa)
-     *
-     * ┌───────┬──────┬──────┬──────┬──────┬──────┐       ┌──────┬──────┬──────┬──────┬──────┬──────┐
-     * │ BOOT  │      │      │      │      │      │       │      │      │      │      │      │      │
-     * ├───────┼──────┼──────┼──────┼──────┼──────┤       ├──────┼──────┼──────┼──────┼──────┼──────┤
-     * │TogRGB │HueUp │SatUp │ValUp │      │      │       │ Prev │ Stop │ Play │ Next │      │      │
-     * ├───────┼──────┼──────┼──────┼──────┼──────┤       ├──────┼──────┼──────┼──────┼──────┼──────┤
-     * │NextMod│HueDn │SatDn │ValDn │      │      │       │VolDn │ Mute │VolUp │      │      │      │
-     * └───────┴──────┴──────┴──────┴──────┴──────┘       └──────┴──────┴──────┴──────┴──────┴──────┘
-     *                     ┌───────┬───────┬───────┐ ┌───────┬───────┬───────┐
-     *                     │  GUI  │  ▼▼▼  │ Space │ │ Enter │  ▼▼▼  │ RAlt  │
-     *                     └───────┴───────┴───────┘ └───────┴───────┴───────┘
+     * Se activa con MO(1)+MO(2) simultáneos
      * ─────────────────────────────────────────────────────────────────────*/
     [3] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
@@ -148,48 +130,70 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           KC_LGUI, _______, KC_SPC,     KC_ENT, _______, KC_RALT
                                       //`--------------------------'  `--------------------------'
+    ),
+
+    /* ─────────────────────────────────────────────────────────────────────
+     * Capa 4: MOUSE — Auto mouse layer
+     *
+     * Se activa AUTOMÁTICAMENTE al mover el trackpad.
+     * Se desactiva sola al dejar de mover el cursor (~600ms timeout).
+     *
+     * Thumbs izquierdos:  BTN2 (clic derecho) | BTN1 (clic izq) | BTN3 (medio)
+     * Thumbs derechos:    BTN1 (clic izq)     | BTN2 (clic der) | —
+     *
+     * Los clics están duplicados en ambas mitades para que puedas hacer
+     * clic con cualquier pulgar sin importar qué mano mueve el trackpad.
+     *
+     * Todas las demás teclas son XXXXXXX — al presionar cualquier tecla
+     * normal la capa se desactiva inmediatamente y la tecla funciona normal.
+     * ─────────────────────────────────────────────────────────────────────*/
+    [4] = LAYOUT_split_3x6_3(
+  //,-----------------------------------------------------.                    ,-----------------------------------------------------.
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
+                                          MS_BTN2, MS_BTN1, MS_BTN3,   MS_BTN1, MS_BTN2, XXXXXXX
+                                      //`--------------------------'  `--------------------------'
     )
 };
 
 /* ─────────────────────────────────────────────────────────────────────────
- * Encoder map — comportamiento diferenciado por capa
- *
- * Capa 0 BASE:   Vol / Media / RGB brillo / Scroll horizontal
- * Capa 1 NAV:    Vol / Historial (Undo/Redo) / RGB brillo / Navegación líneas
- * Capa 2 SYM:    Vol / Tab siguiente/anterior / RGB brillo / Scroll horizontal
- * Capa 3 ADJUST: Vol / Media / RGB brillo / RGB modo
- *
- * Ajusta según los encoders físicos que tengas montados.
+ * Encoder map — 5 capas incluyendo MOUSE
  * ─────────────────────────────────────────────────────────────────────────*/
 #ifdef ENCODER_MAP_ENABLE
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    // Capa 0: volumen | media prev/next | RGB brillo | scroll horizontal
     [0] = {
         ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
         ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
         ENCODER_CCW_CW(RM_VALD, RM_VALU),
         ENCODER_CCW_CW(KC_RGHT, KC_LEFT),
     },
-    // Capa 1 NAV: volumen | undo/redo | RGB brillo | línea arriba/abajo
     [1] = {
-        ENCODER_CCW_CW(KC_VOLD,    KC_VOLU),
-        ENCODER_CCW_CW(C(KC_Z),    C(KC_Y)),
-        ENCODER_CCW_CW(RM_VALD,    RM_VALU),
-        ENCODER_CCW_CW(KC_DOWN,    KC_UP),
+        ENCODER_CCW_CW(KC_VOLD,      KC_VOLU),
+        ENCODER_CCW_CW(C(KC_Z),      C(KC_Y)),
+        ENCODER_CCW_CW(RM_VALD,      RM_VALU),
+        ENCODER_CCW_CW(KC_DOWN,      KC_UP),
     },
-    // Capa 2 SYM: volumen | tab prev/next (navegador/editor) | RGB brillo | scroll horizontal
     [2] = {
-        ENCODER_CCW_CW(KC_VOLD,          KC_VOLU),
-        ENCODER_CCW_CW(C(S(KC_TAB)),     C(KC_TAB)),
-        ENCODER_CCW_CW(RM_VALD,          RM_VALU),
-        ENCODER_CCW_CW(KC_RGHT,          KC_LEFT),
+        ENCODER_CCW_CW(KC_VOLD,      KC_VOLU),
+        ENCODER_CCW_CW(C(S(KC_TAB)), C(KC_TAB)),
+        ENCODER_CCW_CW(RM_VALD,      RM_VALU),
+        ENCODER_CCW_CW(KC_RGHT,      KC_LEFT),
     },
-    // Capa 3 ADJUST: volumen | media | RGB siguiente modo | RGB brillo
     [3] = {
         ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
         ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
         ENCODER_CCW_CW(RM_NEXT, RM_PREV),
         ENCODER_CCW_CW(RM_VALD, RM_VALU),
+    },
+    [4] = {
+        ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
+        ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
+        ENCODER_CCW_CW(RM_VALD, RM_VALU),
+        ENCODER_CCW_CW(KC_RGHT, KC_LEFT),
     },
 };
 #endif
